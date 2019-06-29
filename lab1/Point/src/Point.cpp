@@ -14,18 +14,26 @@ void TestPoint() {
     }
     Point<double> e = Point<double>(3, coeffs1);
 
+    Point<double> f = Point<double>(e);
+
     a.print("a:");
     b.print("b:");
     c.print("c:");
     d.print("d:");
     e.print("e:");
+    f.print("f:");
+
+    Point<double> g = f*3;
+    g.print("g:");
 
     a[0] = -1;
 
     b[0] = 6;
     b[1] = -7;
-    b[3] = 44;
     a.print("a:");
     b.print("b:");
+
+    a = b;
+    a.print("a:");
     cout<<"--------------"<<endl;
 }
