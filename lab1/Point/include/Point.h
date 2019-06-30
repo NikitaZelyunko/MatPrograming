@@ -71,6 +71,7 @@ class Point {
             return coeffs[index];
         }
         printOutOfRange(index);
+        return *coeffs;
     }
 
     inline T& enorm() {

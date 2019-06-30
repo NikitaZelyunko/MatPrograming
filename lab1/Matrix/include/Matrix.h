@@ -3,8 +3,11 @@
 
 #include "../../Utils/include/Utils.h"
 
+#include <functional>
+
 template<class T>
 class Matrix {
+
     private:
 
     int rowCount;
@@ -12,7 +15,7 @@ class Matrix {
     // to do change to Row*, for example like alias of Point*
     T** coeffs;
 
-    bool checkBoundary(int index) {
+    bool checkBoundary(int index) const {
         if(index >= 0) {
             if(index < rowCount) {
                 return true;
@@ -21,7 +24,7 @@ class Matrix {
         return false;
     }
 
-    bool checkDimensionsEqual(int n1, int n2, int m1, int m2) {
+    bool checkDimensionsEqual(int n1, int n2, int m1, int m2) const {
         if(n1 != n2) {
             return false;
         }
@@ -31,26 +34,27 @@ class Matrix {
         return true;
     }
 
-    bool checkDimensionsForMultMatrix(int n1, int n2, int m1, int m2){
+    bool checkDimensionsForMultMatrix(int n1, int n2, int m1, int m2) const {
         if(m1 != n2) {
             return false;
         }
         return true;
     }
 
-    inline void printOutOfRange(int index) {
+    inline void printOutOfRange(int index) const {
         cout<<"Out of range "<<"rowCount="<<rowCount<<" index="<<index<<endl;
     }
 
-    inline void printDimensionsIsNotEqual(int n1, int n2, int m1, int m2) {
+    inline void printDimensionsIsNotEqual(int n1, int n2, int m1, int m2) const {
         cout<<"n1="<<n1<<" must be equal to n2="<<n2<<" m1="<<m1<<" must be equal to m2"<<m2<<endl;
     }
 
-    inline void printDimensionsNotValidForMultMatrix(int n1, int n2, int m1, int m2) {
+    inline void printDimensionsNotValidForMultMatrix(int n1, int n2, int m1, int m2) const {
         cout<<"m1="<<m1<<" must be equal to n2="<<n2<<endl;
     }
 
     public:
+
     static int correctDimension(int dimension) {
         return dimension < 0 ? 0 : dimension;
     }
@@ -63,6 +67,20 @@ class Matrix {
                 res[i][j] = coeffs[i][j];
             }
         }
+        return res;
+    }
+
+    static void deleteMatrix(int rowCount, T** coeffs) {
+        for(int i = 0; i < rowCount; i++) {
+            delete [] coeffs[i];
+        }
+        delete [] coeffs;
+    }
+
+    static T** createEmptyArray(int rowCount, int columnCount) {
+        T** res = new T*[rowCount];
+        for(int i = 0; i < rowCount; i++)
+            res[i] = new T[columnCount];
         return res;
     }
 
@@ -87,6 +105,20 @@ class Matrix {
         return Matrix<T>(rowCount, rowCount, coeffs);
     }
 
+    static const Matrix<T> transpose(const Matrix<T>& x) {
+        Matrix<T> res = Matrix<T>(x.columnCount, x.rowCount);
+        res.forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+            res[i][j] = x[j][i];
+        });
+        return res;
+    }
+
+    Matrix(int rowCount, int columnCount) {
+        this->rowCount = correctDimension(rowCount);
+        this->columnCount = correctDimension(columnCount);
+        this->coeffs = createEmptyArray(this->rowCount, this->columnCount);
+    }
+
     Matrix(int rowCount, int columnCount, T** coeffs) {
         this->rowCount = correctDimension(rowCount);
         this->columnCount = correctDimension(columnCount);
@@ -105,79 +137,153 @@ class Matrix {
         this->coeffs = copyMatrix(x.rowCount, x.columnCount, x.coeffs);
     }
 
-    inline T* operator[](int rowIndex) {
+    ~Matrix() {
+        deleteMatrix(rowCount, coeffs);
+    }
+
+    inline void forEach(function<void (int, int, const Matrix<T>&)> callback) const  {
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j < columnCount; j++){
+                callback(i, j, *this);
+            }
+        }
+    }
+    
+    template<class A>
+    inline A& reduce(A& startAcc, function<void (A&, int, int, Matrix<T>&)> callback) const {
+        for(int i = 0; i < rowCount; i++){
+            for(int j = 0; j < columnCount; j++) {
+                startAcc = callback(startAcc, i, j, *this);
+            }
+        }
+        return startAcc;
+    }
+
+    inline const Matrix<T> operator =(const Matrix<T>& x) {
+        deleteMatrix(rowCount, coeffs);
+        rowCount = x.rowCount;
+        columnCount = x.columnCount;
+        coeffs = copyMatrix(rowCount, columnCount, x.coeffs);
+        return *this;
+    }
+
+    inline T* operator[](int rowIndex) const {
         // return T* but perhaps must return Point or Row
         if(checkBoundary(rowIndex)) {
             return coeffs[rowIndex];
         }
         printOutOfRange(rowIndex);
+        return nullptr;
     }
 
-    inline const Matrix<T> operator *(const T& scalar) {
+    inline const Matrix<T> operator *(const T& scalar) const {
         Matrix<T> res = Matrix<T>(*this);
-        for(int i = 0; i < rowCount; i++)
-            for(int j = 0; j < columnCount; j++)
-                res[i][j] *=scalar;
+        forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+            res[i][j] *=scalar;
+        });
         return res;
     }
 
-    inline const Matrix<T> operator -(const Matrix<T>& x) {
-        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
-            Matrix<T> res = Matrix<T>(*this);
-            for(int i = 0; i < rowCount; i++)
-                for(int j = 0; j < columnCount; j++)
-                    res[i][j] = coeffs[i][j] - x[i][j];
-            return res;
-        }
-        printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+    inline const Matrix<T> operator *=(const T& scalar) {
+        forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+            matrix[i][j] *= scalar;
+        });
+        return *this;
     }
 
-    inline const Matrix<T> operator +(const Matrix<T>& x) {
+    inline const Matrix<T> operator -(const Matrix<T>& x) const {
+        Matrix<T> res = Matrix<T>(*this);
         if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
-            Matrix<T> res = Matrix<T>(*this);
-            for(int i = 0; i < rowCount; i++)
-                for(int j = 0; j < columnCount; j++)
-                    res[i][j] = coeffs[i][j] + x[i][j];
-            return res;
+            res.forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+                matrix[i][j] = coeffs[i][j] - x[i][j];
+            });
+        } else {
+            printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
         }
-        printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+        return res;
     }
 
-    inline const Matrix<T> operator *(const Matrix<T>& x) {
+    inline const Matrix<T> operator -=(const Matrix<T>& x) {
+        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
+            forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+                matrix[i][j] -= x[i][j];
+            });
+        } else {
+            printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+        }
+        return *this;
+    }
+
+    inline const Matrix<T> operator +(const Matrix<T>& x) const {
+        Matrix<T> res = Matrix<T>(*this);
+        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
+            res.forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+                matrix[i][j] = coeffs[i][j] + x[i][j];
+            });
+        } else {
+            printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+        }
+        return res;
+    }
+
+    inline const Matrix<T> operator +=(const Matrix<T>& x) {
+        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
+            forEach( [&](int i, int j, const Matrix<T>& matrix) -> void {
+                matrix[i][j] += x[i][j];
+            });
+        } else {
+            printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+        }
+        return *this;
+    }
+
+    inline const Matrix<T> operator *(const Matrix<T>& x) const {
+        Matrix<T> res = Matrix<T>(rowCount, x.columnCount);
         if(checkDimensionsForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount)) {
-            T** coeffs = new T*[rowCount];
-            for(int i = 0; i < rowCount; i++) {
-                coeffs[i] = new T[x.columnCount];
-                for(int j = 0; j < x.columnCount; j++) {
-                    T sum = 0;
-                    for(int k = 0; k < columnCount; k++)
-                        sum+= coeffs[i][k] * x[k][j];
-                    coeffs[i][j] = sum;
-                }
-            }
-            return Matrix<T>(rowCount, x.columnCount, coeffs);
+            res.forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+                T sum = 0;
+                for(int k = 0; k < columnCount; k++)
+                    sum+= coeffs[i][k] * x[k][j];
+                res[i][j] = sum;
+            });
+        } else {
+            printDimensionsNotValidForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount);
         }
-        printDimensionsNotValidForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount);
+        return res;
     }
 
+    inline const Matrix<T> operator *=(Matrix<T>& x) {
+        Matrix<T> res = this->operator*(x);
+        (*this) = res;
+        return *this;
+    }
 
-    inline int getRowCount() {
+    inline const Matrix<T> transpose() {
+        Matrix<T> res = Matrix<T>(columnCount, rowCount);
+        res.forEach([this](int i, int j, const Matrix<T>& matrix) -> void {
+            matrix[i][j] = coeffs[j][i];
+        });
+        (*this) = res;
+        return *this;
+    }
+
+    inline int getRowCount() const {
         return this->rowCount;
     }
 
-    inline int getColumnCount() {
+    inline int getColumnCount() const {
         return this->columnCount;
     }
 
-    inline int n() {
+    inline int n() const {
         return this->rowCount;
     }
 
-    inline int m() {
+    inline int m() const {
         return this->columnCount;
     }
 
-    void print(string comment) {
+    void print(string comment) const {
         printArray(coeffs, rowCount, columnCount, comment);
     }
 };

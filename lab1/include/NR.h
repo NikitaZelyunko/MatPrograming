@@ -78,20 +78,20 @@ public:
 		return result;
 	}
 
-	double proizv2(double t) {
-		double* arg = getArg(t);
-		double** hessian = this->hessian(arg, dimCount);
-		if (!dKMatrix) {
-			dKMatrix = getDkMatrix();
-		}
-		double result = 0;
-		for (int i = 0; i < dimCount; i++) {
-			for (int j = 0; j < dimCount; j++) {
-				result += hessian[i][j] * dKMatrix[i][j];
-			}
-		}
-		deleteTwoDimArray(hessian, dimCount);
-	}
+	// double proizv2(double t) {
+	// 	double* arg = getArg(t);
+	// 	double** hessian = this->hessian(arg, dimCount);
+	// 	if (!dKMatrix) {
+	// 		dKMatrix = getDkMatrix();
+	// 	}
+	// 	double result = 0;
+	// 	for (int i = 0; i < dimCount; i++) {
+	// 		for (int j = 0; j < dimCount; j++) {
+	// 			result += hessian[i][j] * dKMatrix[i][j];
+	// 		}
+	// 	}
+	// 	deleteTwoDimArray(hessian, dimCount);
+	// }
 
 	double getGlobalMinimum(double a, double b, double epsilon) {
 		double h = epsilon;
