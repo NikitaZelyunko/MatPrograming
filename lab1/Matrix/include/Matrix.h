@@ -3,8 +3,11 @@
 
 #include "../../Utils/include/Utils.h"
 
+#include <functional>
+
 template<class T>
 class Matrix {
+
     private:
 
     int rowCount;
@@ -51,6 +54,7 @@ class Matrix {
     }
 
     public:
+
     static int correctDimension(int dimension) {
         return dimension < 0 ? 0 : dimension;
     }
@@ -63,6 +67,20 @@ class Matrix {
                 res[i][j] = coeffs[i][j];
             }
         }
+        return res;
+    }
+
+    static void deleteMatrix(int rowCount, T** coeffs) {
+        for(int i = 0; i < rowCount; i++) {
+            delete [] coeffs[i];
+        }
+        delete [] coeffs;
+    }
+
+    static T** createEmptyArray(int rowCount, int columnCount) {
+        T** res = new T*[rowCount];
+        for(int i = 0; i < rowCount; i++)
+            res[i] = new T[columnCount];
         return res;
     }
 
@@ -85,6 +103,12 @@ class Matrix {
             coeffs[i][i] = 1;
         }
         return Matrix<T>(rowCount, rowCount, coeffs);
+    } 
+
+    Matrix(int rowCount, int columnCount) {
+        this->rowCount = correctDimension(rowCount);
+        this->columnCount = correctDimension(columnCount);
+        this->coeffs = createEmptyArray(this->rowCount, this->columnCount);
     }
 
     Matrix(int rowCount, int columnCount, T** coeffs) {
@@ -105,6 +129,36 @@ class Matrix {
         this->coeffs = copyMatrix(x.rowCount, x.columnCount, x.coeffs);
     }
 
+    ~Matrix() {
+        deleteMatrix(rowCount, coeffs);
+    }
+
+    inline void forEach(function<void (int, int, Matrix<T>&)> callback) {
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j < columnCount; j++){
+                callback(i, j, *this);
+            }
+        }
+    }
+    
+    template<class A>
+    inline A& reduce(A& startAcc, function<void (A&, int, int, Matrix<T>&)> callback) {
+        for(int i = 0; i < rowCount; i++){
+            for(int j = 0; j < columnCount; j++) {
+                startAcc = callback(startAcc, i, j, *this);
+            }
+        }
+        return startAcc;
+    }
+
+    inline const Matrix<T> operator =(const Matrix<T>& x) {
+        deleteMatrix(rowCount, coeffs);
+        rowCount = x.rowCount;
+        columnCount = x.columnCount;
+        coeffs = copyMatrix(rowCount, columnCount, x.coeffs);
+        return *this;
+    }
+
     inline T* operator[](int rowIndex) {
         // return T* but perhaps must return Point or Row
         if(checkBoundary(rowIndex)) {
@@ -121,6 +175,15 @@ class Matrix {
         return res;
     }
 
+    inline const Matrix<T> operator *=(const T& scalar) {
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j < columnCount; j++) {
+                coeffs[i][j] *=scalar;
+            }
+        }
+        return *this;
+    }
+
     inline const Matrix<T> operator -(const Matrix<T>& x) {
         if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
             Matrix<T> res = Matrix<T>(*this);
@@ -128,6 +191,16 @@ class Matrix {
                 for(int j = 0; j < columnCount; j++)
                     res[i][j] = coeffs[i][j] - x[i][j];
             return res;
+        }
+        printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+    }
+
+    inline const Matrix<T> operator -=(Matrix<T>& x) {
+        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
+            forEach( [&](int i, int j, Matrix<T>& matrix) -> void {
+                matrix[i][j] -= x[i][j];
+            });
+            return *this;
         }
         printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
     }
@@ -143,23 +216,49 @@ class Matrix {
         printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
     }
 
-    inline const Matrix<T> operator *(const Matrix<T>& x) {
+    inline const Matrix<T> operator +=(const Matrix<T>& x) {
+        if(checkDimensionsEqual(rowCount, x.rowCount, columnCount, x.columnCount)) {
+            for(int i = 0; i < rowCount; i++)
+                for(int j = 0; j < columnCount; j++)
+                    coeffs[i][j] += x[i][j];
+            return *this;
+        }
+        printDimensionsIsNotEqual(rowCount, x.rowCount, columnCount, x.columnCount);
+    }
+
+    inline const Matrix<T> operator *(Matrix<T>& x) {
         if(checkDimensionsForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount)) {
-            T** coeffs = new T*[rowCount];
-            for(int i = 0; i < rowCount; i++) {
-                coeffs[i] = new T[x.columnCount];
-                for(int j = 0; j < x.columnCount; j++) {
-                    T sum = 0;
-                    for(int k = 0; k < columnCount; k++)
-                        sum+= coeffs[i][k] * x[k][j];
-                    coeffs[i][j] = sum;
-                }
-            }
-            return Matrix<T>(rowCount, x.columnCount, coeffs);
+            Matrix<T> res = Matrix<T>(rowCount, x.columnCount);
+            res.forEach([&](int i, int j, Matrix<T>& matrix) -> void {
+                T sum = 0;
+                for(int k = 0; k < columnCount; k++)
+                    sum+= coeffs[i][k] * x[k][j];
+                res[i][j] = sum;
+            });
+            return res;
         }
         printDimensionsNotValidForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount);
     }
 
+    inline const Matrix<T> operator *=(Matrix<T>& x) {
+        Matrix<T> res = this->operator*(x);
+        (*this) = res;
+        return *this;
+        // if(checkDimensionsForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount)) {
+        //     Matrix<T> res = Matrix<T>(rowCount, x.columnCount);
+        //     for(int i = 0; i < rowCount; i++) {
+        //         res[i] = new T[x.columnCount];
+        //         for(int j = 0; j < x.columnCount; j++) {
+        //             T sum = 0;
+        //             for(int k = 0; k < columnCount; k++)
+        //                 sum+= coeffs[i][k] * x[k][j];
+        //             res[i][j] = sum;
+        //         }
+        //     }
+
+        // }
+        // printDimensionsNotValidForMultMatrix(rowCount, x.rowCount, columnCount, x.columnCount);
+    }
 
     inline int getRowCount() {
         return this->rowCount;
