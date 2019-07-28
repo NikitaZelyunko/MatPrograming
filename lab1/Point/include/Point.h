@@ -1,7 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "../../Utils/include/Utils.h"
+#include "Utils.h"
 
 template<class T>
 class Point {

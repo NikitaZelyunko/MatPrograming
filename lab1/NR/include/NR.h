@@ -1,3 +1,6 @@
+#ifndef NR_H
+#define NR_H
+
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
@@ -6,7 +9,7 @@
 #include <vector>
 #include <limits>
 
-#include "../Utils/include/Utils.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -157,3 +160,5 @@ public:
 };
 
 MatrixWithDeterm* inverseMatrix(MatrixWithDeterm &matrix, double epsilon);
+
+#endif

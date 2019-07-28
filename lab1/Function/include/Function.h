@@ -1,7 +1,8 @@
 #ifndef FUNCTION_H
 #define FUNCTION_H
+
 #include <iostream>
-#include "../../Point/include/Point.h"
+#include "Point.h"
 
 using namespace std;
 

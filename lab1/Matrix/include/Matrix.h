@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "../../Utils/include/Utils.h"
+#include "Utils.h"
 
 #include <functional>
 

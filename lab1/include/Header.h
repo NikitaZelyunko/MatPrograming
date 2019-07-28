@@ -1,3 +1,3 @@
 #include "NR.h"
-#include "../Point/include/Point.h"
-#include "../Matrix/include/Matrix.h"
+#include "Point.h"
+#include "Matrix.h"
