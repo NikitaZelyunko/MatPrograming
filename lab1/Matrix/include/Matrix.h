@@ -149,8 +149,7 @@ class Matrix {
         }
     }
     
-    template<class A>
-    inline A& reduce(A& startAcc, function<void (A&, int, int, Matrix<T>&)> callback) const {
+    inline const T reduce(T startAcc, function<T (T&, int, int, const Matrix<T>&)> callback) const {
         for(int i = 0; i < rowCount; i++){
             for(int j = 0; j < columnCount; j++) {
                 startAcc = callback(startAcc, i, j, *this);

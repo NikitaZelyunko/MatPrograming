@@ -3,10 +3,12 @@
 
 template<class T>
 class AbstractSolver {
-private:
+protected:
     T result;
-
-    virtual const T solve();
+public:
+    virtual const T solve(){return 0;}
+    AbstractSolver(){};
+    ~AbstractSolver(){};
 };
 
 #endif

@@ -11,6 +11,7 @@ add_library(MatrixDeterminantSolver STATIC
 
 target_link_libraries(MatrixDeterminantSolver Utils)
 target_link_libraries(MatrixDeterminantSolver AbstractSolver)
+target_link_libraries(MatrixDeterminantSolver Matrix)
 
 target_include_directories(MatrixDeterminantSolver PRIVATE ${SOURCE_DIR})
 target_include_directories(MatrixDeterminantSolver PUBLIC ${INCLUDE_DIR})
