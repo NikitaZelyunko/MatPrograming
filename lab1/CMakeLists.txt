@@ -8,7 +8,8 @@ add_subdirectory(Function)
 add_subdirectory(Point)
 add_subdirectory(Utils)
 add_subdirectory(Matrix)
-add_subdirectory(AbstractSolver)
+add_subdirectory(Abstract-solver)
+add_subdirectory(Matrix-determinant-solver)
 
 add_subdirectory(NR)
 
@@ -23,5 +24,7 @@ target_link_libraries(lab1 Point)
 target_link_libraries(lab1 Matrix)
 target_link_libraries(lab1 Function)
 target_link_libraries(lab1 AbstractSolver)
+
+target_link_libraries(lab1 MatrixDeterminantSolver)
 
 target_link_libraries(lab1 NR)
