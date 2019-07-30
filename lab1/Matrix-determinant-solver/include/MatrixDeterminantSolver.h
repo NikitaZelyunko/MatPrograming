@@ -13,22 +13,36 @@ class MatrixDeterminantSolver : public AbstractSolver<T>
 private: 
     Matrix<T> matrix = Matrix<T>(0,0);
     bool isTriangular = false;
-    bool convertToTriangular = true;
 
     void solverNotInited() const {
-        cout<<"Solver not inited"<<endl;
+        cout<<endl<<"Solver not inited"<<endl;
     }
 
     void solverNotSolved() const {
-        cout<<"Solver not solved"<<endl;
+        cout<<endl<<"Solver not solved"<<endl;
     }
-    const T evaluateDet() const {
-        if(this->isTriangular) {
-            return this->matrix.reduce(1, [&](T acc, int i, int j, const Matrix<T>& matrix) -> const T {
+
+    const T computeTriangularDet(const Matrix<T>& x) const {
+        return x.reduce(1, [&](T acc, int i, int j, const Matrix<T>& matrix) -> const T {
                 return i == j ? acc * matrix[i][j] : acc;
-            });
+        });
+    }
+
+    const Matrix<T> getLowerTriangular() const {
+        return Matrix<T>(1,1,1);
+    }
+
+    const T evaluateGeneralFormMatrixDet() const {
+        Matrix<T> lowerTriangMatrix = this->getLowerTriangular();
+        return this->computeTriangularDet(lowerTriangMatrix);
+    }
+
+    const T computeDet() {
+        if(this->isTriangular) {
+            return this->computeTriangularDet(this->matrix);
+        } else {
+            return this->evaluateGeneralFormMatrixDet();
         }
-        return 0;
     }
 
 public:
@@ -42,14 +56,8 @@ public:
         this->isTriangular = isTriangular;
     }
 
-    MatrixDeterminantSolver(const Matrix<T>& matrix, bool isTriangular, bool convertToTriangular) {
-        this->matrix = Matrix<T>(matrix);
-        this->isTriangular = isTriangular;
-        this->convertToTriangular = convertToTriangular;
-    }
-
     const T solve() {
-        this->result = this->evaluateDet();
+        this->result = this->computeDet();
         return this->getResult();
     }
 
