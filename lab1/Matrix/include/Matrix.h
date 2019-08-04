@@ -141,6 +141,13 @@ class Matrix {
         deleteMatrix(rowCount, coeffs);
     }
 
+    inline void forDiag(function<void (int, const Matrix<T>&)> callback) const {
+        int diagCount = min(rowCount, columnCount);
+        for(int i = 0; i < diagCount; i++) {
+            callback(i, *this);
+        }
+    }
+
     inline void forEach(function<void (int, int, const Matrix<T>&)> callback) const  {
         for(int i = 0; i < rowCount; i++) {
             for(int j = 0; j < columnCount; j++){
@@ -149,11 +156,19 @@ class Matrix {
         }
     }
     
-    inline const T reduce(T startAcc, function<T (T&, int, int, const Matrix<T>&)> callback) const {
+    inline const T forEachReduce(T startAcc, function<T (T&, int, int, const Matrix<T>&)> callback) const {
         for(int i = 0; i < rowCount; i++){
             for(int j = 0; j < columnCount; j++) {
                 startAcc = callback(startAcc, i, j, *this);
             }
+        }
+        return startAcc;
+    }
+
+    inline const T forDiagReduce(T startAcc, function<T (T&, int, const Matrix<T>&)> callback) const {
+        int diagCount = min(rowCount, columnCount);
+        for(int i = 0; i < diagCount; i++){
+            startAcc = callback(startAcc, i, *this);
         }
         return startAcc;
     }
@@ -264,6 +279,12 @@ class Matrix {
         });
         (*this) = res;
         return *this;
+    }
+
+    void swapRows(int one, int another) const {
+        for (int j = 0; j < columnCount; j++) {
+            swap(coeffs[one][j], coeffs[another][j]);
+        }
     }
 
     inline int getRowCount() const {
