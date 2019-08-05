@@ -173,6 +173,92 @@ class Matrix {
         return startAcc;
     }
 
+    inline void forLowerTriangle(function<void (int, int, const Matrix<T>&)> callback) {
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j <= i; j++) {
+                callback(i, j, *this);
+            }
+        }
+    }
+
+    inline void forUpperTriangle(function<void (int, int, const Matrix<T>&)> callback) {
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = i; j < columnCount; j++) {
+                callback(i, j, *this);
+            }
+        }
+    }
+
+    inline bool someByElements(
+        function<bool (int, int, const Matrix<T>&)> callback, 
+        function<void (function<bool (int, int, const Matrix<T>&)>)> forEacher) const {
+        try {
+            forEacher([&](int i, int j, const Matrix<T>& matrix) -> void {
+                if(callback(i, j, matrix)) {
+                    throw true;
+                }
+            });
+        }
+        catch(bool breaker) {
+            return breaker;
+        }
+        return false;
+    }
+
+    inline bool some(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return someByElements(callback, forEach);
+        // try {
+        //     forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
+        //         if(callback(i, j, matrix)) {
+        //             throw true;
+        //         }
+        //     });
+        // }
+        // catch(bool breaker) {
+        //     return breaker;
+        // }
+        // return false;
+    }
+
+
+
+    inline bool someUpperTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return someByElements(callback, forUpperTriangle);
+    }
+
+    inline bool someLowerTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return someByElements(callback, forLowerTriangle);
+    }
+
+    inline bool someDiag(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return someByElements(callback, forDiag);
+    }
+
+    inline bool everyByElements(
+        function<bool (int, int, const Matrix<T>&)> callback, 
+        function<void (function<bool (int, int, const Matrix<T>&)>)> forEacher) const {
+        
+        return someByElements([&](int i, int j, const Matrix<T>& matrix) -> bool {
+            return !callback(i, j, matrix);
+        }, forEacher);
+    }
+
+    inline const T every(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return everyByElements(callback, forEach);
+    }
+
+    inline const T everyUpperTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return everyByElements(callback, forUpperTriangle);
+    }
+
+    inline const T everyLowerTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return everyByElements(callback, forLowerTriangle);
+    }
+
+    inline const T everyDiag(function<bool (int, int, const Matrix<T>&)> callback) const {
+        return everyByElements(callback, forDiag);
+    }
+
     inline const Matrix<T> operator =(const Matrix<T>& x) {
         deleteMatrix(rowCount, coeffs);
         rowCount = x.rowCount;

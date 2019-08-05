@@ -10,7 +10,7 @@ add_library(MatrixDeterminantSolver STATIC
     ${SOURCE_DIR}/MatrixDeterminantSolver.cpp)
 
 target_link_libraries(MatrixDeterminantSolver Utils)
-target_link_libraries(MatrixDeterminantSolver AbstractSolver)
+target_link_libraries(MatrixDeterminantSolver MatrixAbstractSolver)
 target_link_libraries(MatrixDeterminantSolver Matrix)
 
 target_include_directories(MatrixDeterminantSolver PRIVATE ${SOURCE_DIR})

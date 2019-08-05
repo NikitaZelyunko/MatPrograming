@@ -4,34 +4,15 @@
 #include <iostream>
 #include <string>
 
-#include "AbstractSolver.h"
+#include "MatrixAbstractSolver.h"
 #include "Matrix.h"
 
 const int MATRIX_IS_DEGENERATE = 0;
 
 template <class T>
-class MatrixDeterminantSolver : public AbstractSolver<T>
+class MatrixDeterminantSolver : public MatrixAbstractSolver<T>
 {
-private: 
-    Matrix<T> matrix = Matrix<T>(0,0);
-    bool isTriangular = false;
-
-    void solverNotInited() const {
-        cout<<endl<<"Solver not inited"<<endl;
-    }
-
-    void solverNotSolved() const {
-        cout<<endl<<"Solver not solved. Run solve() method before ask result."<<endl;
-    }
-
-    void matrixNotSquare() const {
-        cout<<endl<<"The matrix is not square. The search for a determinant cannot be performed."<<endl;
-    }
-
-    bool isSquare(const Matrix<T>& x) const {
-        return x.getRowCount() == x.getColumnCount();
-    }
-
+private:
     int findRowIndexMaxElementInColumnFromL(const Matrix<T>& x, int k, int l) const {
         int indexMax = l;
         T maxElem = x[l][l];
@@ -45,18 +26,18 @@ private:
     }
 
     const T computeTriangularDet(const Matrix<T>& x) const {
-        if(isSquare(x)) {
+        if(this->isSquare(x)) {
             return x.forDiagReduce(1, [&](T acc, int i, const Matrix<T>& matrix) -> const T {
                 return acc * matrix[i][i];
             });
         }
-        matrixNotSquare();
+        this->matrixNotSquare();
         return this->getResult();
     }
 
     const T evaluateGeneralFormMatrixDet() const {
-        if(isSquare(matrix)) {
-            Matrix<T> resultMatrix = Matrix<T>(matrix);
+        if(this->isSquare(this->matrix)) {
+            Matrix<T> resultMatrix = Matrix<T>(this->matrix);
             T det = 1;
             try {
                 resultMatrix.forDiag([&](int i, const Matrix<T>& x) -> void {
@@ -87,12 +68,12 @@ private:
             }
         } 
         else {
-            matrixNotSquare();
+            this->matrixNotSquare();
         }
         return this->getResult();
     }
 
-    const T computeDet() {
+    const T computeDet() const {
         if(this->isTriangular) {
             return this->computeTriangularDet(this->matrix);
         } else {
@@ -101,25 +82,10 @@ private:
     }
 
 public:
-
-    MatrixDeterminantSolver(const Matrix<T>& matrix, T epsilon) {
-        this->matrix = Matrix<T>(matrix);
-        this->epsilon = epsilon;
-    }
-
-    MatrixDeterminantSolver(const Matrix<T>& matrix, T epsilon, bool isTriangular) {
-        this->matrix = Matrix<T>(matrix);
-        this->epsilon = epsilon;
-        this->isTriangular = isTriangular;
-    }
-
+    using MatrixAbstractSolver<T>::MatrixAbstractSolver;
     const T solve() {
         this->setResult(computeDet());
         return this->getResult();
-    }
-
-    bool isSolved() {
-        return this->isInit;
     }
 
     void print(string prefix) const {
