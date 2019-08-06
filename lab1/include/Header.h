@@ -2,3 +2,4 @@
 #include "Point.h"
 #include "Matrix.h"
 #include "MatrixDeterminantSolver.h"
+#include "MatrixInverseSolver.h"

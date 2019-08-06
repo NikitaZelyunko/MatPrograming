@@ -9,25 +9,14 @@
 
 const int MATRIX_IS_DEGENERATE = 0;
 
-template <class T>
-class MatrixDeterminantSolver : public MatrixAbstractSolver<T>
+template <class R>
+class MatrixDeterminantSolver : public MatrixAbstractSolver<R, R>
 {
 private:
-    int findRowIndexMaxElementInColumnFromL(const Matrix<T>& x, int k, int l) const {
-        int indexMax = l;
-        T maxElem = x[l][l];
-        for (int i = l; i < x.getRowCount(); i++) {
-            if (abs(x[i][k]) > abs(maxElem)) {
-                indexMax = i;
-                maxElem = x[i][k];
-            }
-        }
-        return indexMax;
-    }
 
-    const T computeTriangularDet(const Matrix<T>& x) const {
-        if(this->isSquare(x)) {
-            return x.forDiagReduce(1, [&](T acc, int i, const Matrix<T>& matrix) -> const T {
+    const R computeTriangularDet(const Matrix<R>& x) const {
+        if(Matrix<R>::isSquare(x)) {
+            return x.forDiagReduce(1, [&](R acc, int i, const Matrix<R>& matrix) -> const R {
                 return acc * matrix[i][i];
             });
         }
@@ -35,58 +24,30 @@ private:
         return this->getResult();
     }
 
-    const T evaluateGeneralFormMatrixDet() const {
-        if(this->isSquare(this->matrix)) {
-            Matrix<T> resultMatrix = Matrix<T>(this->matrix);
-            T det = 1;
-            try {
-                resultMatrix.forDiag([&](int i, const Matrix<T>& x) -> void {
-                    if(i != x.getRowCount() - 1) {
-                        int maxIndex = findRowIndexMaxElementInColumnFromL(x, i, i);
-                        if (i != maxIndex) {
-                            x.swapRows(i, maxIndex);
-                            det *= -1;
-                        }
-                        T xii = x[i][i];
-                        if (abs(xii) < this->epsilon) {
-                            throw MATRIX_IS_DEGENERATE;
-                        }
-                        for(int k = i + 1; k < x.getColumnCount(); k++) {
-                            T identifier = x[k][i]/xii;
-                            for (int j = i; j < x.getColumnCount(); j++) {
-                                x[k][j] -= x[i][j] * identifier;
-                            }
-                        }
-                    }
-                });
-                return det * computeTriangularDet(resultMatrix);
-            }
-            catch (int err) {
-                if(err == MATRIX_IS_DEGENERATE) {
-                    return 0;
-                }
-            }
-        } 
+    const R evaluateGeneralFormMatrixDet() const {
+        R detMult = 1;
+        Matrix<R> resultMatrix = getLowerTriangleMatrix(this->matrix, detMult, this->getEpsilon());
+        if(Matrix<R>::isSquare(resultMatrix)) {
+            return detMult * computeTriangularDet(resultMatrix);
+        }
         else {
             this->matrixNotSquare();
         }
         return this->getResult();
     }
 
-    const T computeDet() const {
+protected: 
+    virtual const R computeResult() const {
         if(this->isTriangular) {
             return this->computeTriangularDet(this->matrix);
-        } else {
+        } 
+        else {
             return this->evaluateGeneralFormMatrixDet();
         }
     }
 
 public:
-    using MatrixAbstractSolver<T>::MatrixAbstractSolver;
-    const T solve() {
-        this->setResult(computeDet());
-        return this->getResult();
-    }
+    using MatrixAbstractSolver<R, R>::MatrixAbstractSolver;
 
     void print(string prefix) const {
         if(this->matrix) {
@@ -96,6 +57,51 @@ public:
         } else {
             this->solverNotInited();
         }
+    }
+
+    static int findRowIndexMaxElementInColumnFromL(const Matrix<R>& x, int k, int l) {
+        int indexMax = l;
+        R maxElem = x[l][l];
+        for (int i = l; i < x.getRowCount(); i++) {
+            if (abs(x[i][k]) > abs(maxElem)) {
+                indexMax = i;
+                maxElem = x[i][k];
+            }
+        }
+        return indexMax;
+    }
+
+    static const Matrix<R> getLowerTriangleMatrix(const Matrix<R>& matrix, R& detMult, R epsilon) {
+        Matrix<R> resultMatrix = Matrix<R>(matrix);
+        if(Matrix<R>::isSquare(resultMatrix)) {
+            try {
+                resultMatrix.forDiag([&](int i, const Matrix<R>& x) -> void {
+                    if(i != x.getRowCount() - 1) {
+                        int maxIndex = findRowIndexMaxElementInColumnFromL(x, i, i);
+                        if (i != maxIndex) {
+                            x.swapRows(i, maxIndex);
+                            detMult *= -1;
+                        }
+                        R xii = x[i][i];
+                        if (abs(xii) < epsilon) {
+                            throw MATRIX_IS_DEGENERATE;
+                        }
+                        for(int k = i + 1; k < x.getColumnCount(); k++) {
+                            R identifier = x[k][i]/xii;
+                            for (int j = i; j < x.getColumnCount(); j++) {
+                                x[k][j] -= x[i][j] * identifier;
+                            }
+                        }
+                    }
+                });
+            }
+            catch (int err) {
+                if(err == MATRIX_IS_DEGENERATE) {
+                    detMult = 0;
+                }
+            }
+        }
+        return resultMatrix;
     }
 };
 

@@ -7,8 +7,7 @@ class OneDimensionalFunction : public Function<T>
 {
 public:
     virtual T& operator() (T&);
-    OneDimensionalFunction() {
-    }
+    OneDimensionalFunction() {}
     ~OneDimensionalFunction();
 };
 

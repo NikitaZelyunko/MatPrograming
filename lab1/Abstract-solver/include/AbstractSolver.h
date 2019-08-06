@@ -3,14 +3,15 @@
 
 #include <iostream>
 
-template<class T>
+/* R - result type, S - scalar type (epsilon type) */
+template<class R, class S>
 class AbstractSolver {
 private:
-    T result;
+    R result;
 protected:
 
     bool isInit = false;
-    T epsilon;
+    S epsilon;
 
     virtual void solverNotInited() const {
         std::cout<<std::endl<<"Solver not inited"<<std::endl;
@@ -24,18 +25,31 @@ protected:
         std::cout<<std::endl<<"result is not inited"<<std::endl;
     }
 
-    const T setResult(const T& newValue) {
+    /* 
+        Define this in your class (remember about function signature)
+        const R computeResult() const;
+    */
+    virtual const R computeResult() const {return this->getResult();}
+
+    const R setResult(const R& newValue) {
         isInit = true;
         result = newValue;
         return result;
     }
 
-    AbstractSolver(T epsilon){
+    AbstractSolver() {
+        this->epsilon = 0;
+    }
+
+    AbstractSolver(S epsilon) {
         this->epsilon = epsilon;
-    };
+    }
 
 public:
-    virtual const T solve() {return this->result;};
+    const R solve() {
+        this->setResult(computeResult());
+        return this->getResult();
+    };
     
     ~AbstractSolver(){};
 
@@ -43,14 +57,14 @@ public:
         return this->isInit;
     }
 
-    const T getResult() const {
+    const R getResult() const {
         if(!isInit) {
            resultIsNotInited();
         }
         return this->result;
     }
 
-    const T getEpsilon() const {
+    const S getEpsilon() const {
         return this->epsilon;
     }
 

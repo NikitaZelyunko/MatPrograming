@@ -55,6 +55,10 @@ class Matrix {
 
     public:
 
+    static bool isSquare(const Matrix<T>& matrix) {
+        return matrix.getRowCount() == matrix.getColumnCount();
+    }
+
     static int correctDimension(int dimension) {
         return dimension < 0 ? 0 : dimension;
     }
@@ -111,6 +115,12 @@ class Matrix {
             res[i][j] = x[j][i];
         });
         return res;
+    }
+
+    Matrix() {
+        this->rowCount = 0;
+        this->columnCount = 0;
+        this->coeffs = nullptr;
     }
 
     Matrix(int rowCount, int columnCount) {
