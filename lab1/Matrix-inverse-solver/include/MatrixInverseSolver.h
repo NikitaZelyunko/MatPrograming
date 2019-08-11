@@ -13,6 +13,7 @@ class MatrixInverseSolver : public MatrixAbstractSolver<Matrix<S>, S> {
         S detMult = 1;
         Matrix<S> resultMatrix = Matrix<S>(this->matrix);
         Matrix<S> E = Matrix<S>::createIdentityMatrix(resultMatrix.getRowCount());
+
         if(Matrix<S>::isSquare(resultMatrix)) {
             try {
                 resultMatrix.forDiag([&](int i, const Matrix<S>& x) -> void {

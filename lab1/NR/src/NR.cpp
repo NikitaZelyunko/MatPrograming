@@ -87,7 +87,7 @@ double* getTochnValue(
 	F f, Grad grad, Hessian h, Min min,
 	int M) {
 
-	double *result = createOneDimArray(n);
+//	double *result = createOneDimArray(n);
 
 	double *gradXk;
 

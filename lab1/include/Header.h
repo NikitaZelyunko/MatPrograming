@@ -3,3 +3,4 @@
 #include "Matrix.h"
 #include "MatrixDeterminantSolver.h"
 #include "MatrixInverseSolver.h"
+#include "MatrixSylvesterTest.h"

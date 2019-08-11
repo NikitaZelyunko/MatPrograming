@@ -15,6 +15,7 @@ add_subdirectory(Matrix-abstract-solver)
 
 add_subdirectory(Matrix-determinant-solver)
 add_subdirectory(Matrix-inverse-solver)
+add_subdirectory(Matrix-sylvester-test)
 
 add_subdirectory(NR)
 
@@ -34,5 +35,7 @@ target_link_libraries(lab1 MatrixAbstractSolver)
 target_link_libraries(lab1 MatrixInverseSolver)
 
 target_link_libraries(lab1 MatrixDeterminantSolver)
+
+target_link_libraries(lab1 MatrixSylvesterTest)
 
 target_link_libraries(lab1 NR)
