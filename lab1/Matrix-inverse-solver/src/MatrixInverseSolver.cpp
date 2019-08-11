@@ -2,6 +2,7 @@
 
 void TestMatrixInverseSolver() {
     Matrix<double> a(1,1,2);
+    a.print("a:");
     MatrixInverseSolver<double> solver1(a, 0.00001);
     Matrix<double> result = solver1.solve();
     result.print("Result:");
@@ -13,5 +14,7 @@ void TestMatrixInverseSolver() {
     b.print("b:");
 
     MatrixInverseSolver<double> solver2(b, 0.00001);
-    solver2.solve().print("B^(-1):");
+    Matrix<double>b_1 = solver2.solve();
+    b_1.print("B^(-1):");
+    (b*b_1).print("B*B^(-1):", 5, 5);
 }

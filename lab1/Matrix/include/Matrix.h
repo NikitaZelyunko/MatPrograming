@@ -217,17 +217,6 @@ class Matrix {
 
     inline bool some(function<bool (int, int, const Matrix<T>&)> callback) const {
         return someByElements(callback, forEach);
-        // try {
-        //     forEach([&](int i, int j, const Matrix<T>& matrix) -> void {
-        //         if(callback(i, j, matrix)) {
-        //             throw true;
-        //         }
-        //     });
-        // }
-        // catch(bool breaker) {
-        //     return breaker;
-        // }
-        // return false;
     }
 
 
@@ -400,7 +389,23 @@ class Matrix {
     }
 
     void print(string comment) const {
-        printArray(coeffs, rowCount, columnCount, comment);
+        cout<<comment<<endl;
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j < columnCount; j++) {
+                cout<<coeffs[i][j]<<" ";
+            }
+            cout<<endl;
+        }
+    }
+
+    void print(string comment, int signCount, int precision) const {
+        cout<<comment<<endl;
+        for(int i = 0; i < rowCount; i++) {
+            for(int j = 0; j < columnCount; j++) {
+                cout<<fixed<<setw(signCount)<<setprecision(precision)<<coeffs[i][j]<<" ";
+            }
+            cout<<endl;
+        }
     }
 };
 
