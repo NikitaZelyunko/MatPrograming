@@ -28,4 +28,11 @@ void TestMatrixDeterminantSolver() {
     cout<<"isSolved:"<<solver4.isSolved()<<endl;
     cout<<"Solve result:"<<solver4.solve()<<endl;
     cout<<"isSolved:"<<solver4.isSolved()<<endl;
+
+    Matrix<double> c(1,1,222);
+    c.print("c:");
+    MatrixDeterminantSolver<double> solver5 = MatrixDeterminantSolver<double>(c, 0.00001);
+    cout<<"isSolved:"<<solver5.isSolved()<<endl;
+    cout<<"Solve result:"<<solver5.solve()<<endl;
+    cout<<"isSolved:"<<solver5.isSolved()<<endl;
 }

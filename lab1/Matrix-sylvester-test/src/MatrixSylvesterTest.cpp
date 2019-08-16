@@ -1,7 +1,3 @@
-//
-// Created by Никита on 11.08.2019.
-//
-
 #include "../include/MatrixSylvesterTest.h"
 
 
