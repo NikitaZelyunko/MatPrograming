@@ -216,21 +216,19 @@ class Matrix {
     }
 
     inline bool some(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return someByElements(callback, forEach);
+        return someByElements(callback, this->forEach);
     }
 
-
-
     inline bool someUpperTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return someByElements(callback, forUpperTriangle);
+        return someByElements(callback, this->forUpperTriangle);
     }
 
     inline bool someLowerTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return someByElements(callback, forLowerTriangle);
+        return someByElements(callback, this->forLowerTriangle);
     }
 
     inline bool someDiag(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return someByElements(callback, forDiag);
+        return someByElements(callback, this->forDiag);
     }
 
     inline bool everyByElements(
@@ -243,19 +241,19 @@ class Matrix {
     }
 
     inline const T every(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return everyByElements(callback, forEach);
+        return everyByElements(callback, this->forEach);
     }
 
     inline const T everyUpperTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return everyByElements(callback, forUpperTriangle);
+        return everyByElements(callback, this->forUpperTriangle);
     }
 
     inline const T everyLowerTriangle(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return everyByElements(callback, forLowerTriangle);
+        return everyByElements(callback, this->forLowerTriangle);
     }
 
     inline const T everyDiag(function<bool (int, int, const Matrix<T>&)> callback) const {
-        return everyByElements(callback, forDiag);
+        return everyByElements(callback, this->forDiag);
     }
 
     inline const Matrix<T> operator =(const Matrix<T>& x) {

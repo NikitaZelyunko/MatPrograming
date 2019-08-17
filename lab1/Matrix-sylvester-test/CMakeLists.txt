@@ -13,6 +13,7 @@ add_library(${THIS_PROJECT_NAME} STATIC
 
 target_link_libraries(${THIS_PROJECT_NAME} Matrix)
 target_link_libraries(${THIS_PROJECT_NAME} MatrixAbstractSolver)
+target_link_libraries(${THIS_PROJECT_NAME} Point)
 
 target_include_directories(${THIS_PROJECT_NAME} PRIVATE ${SRC_DIR})
 target_include_directories(${THIS_PROJECT_NAME} PUBLIC ${INCLUDE_DIR})

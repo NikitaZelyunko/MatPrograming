@@ -48,6 +48,15 @@ class MatrixAbstractSolver : public AbstractSolver<R, S> {
         bool isAnyTriangular(const Matrix<S>& matrix) const {
             return isUpperTriangular(matrix) || isLowerTriangular(matrix);
         }
+
+        int findFirstNotNullElementIndexInColumn(const Matrix<S>& matrix, int columnIndex, int startFind) const {
+            for(int i = startFind + 1; i < matrix.getRowCount(); i++) {
+                if(abs(matrix[i][columnIndex]) >= this->getEpsilon()) {
+                    return i;
+                }
+            }
+            return startFind;
+        }
 };
 
 #endif

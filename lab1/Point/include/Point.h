@@ -1,7 +1,12 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include "Utils.h"
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+#include <functional>
+
 
 template<class T>
 class Point {
@@ -11,7 +16,7 @@ class Point {
     // dimension
 
 
-    bool checkBoundary(int index) {
+    bool checkBoundary(int index) const {
         if(index >= 0) {
             if(index < n) {
                 return true;
@@ -20,17 +25,21 @@ class Point {
         return false;
     }
 
-    inline int correctDimension(int dimension) {
+    inline int correctDimension(int dimension) const {
         return dimension < 0 ? 0 : dimension;
     }
 
-    inline void printOutOfRange(int index) {
-        cout<<"Out of range "<<"n="<<n<<" index="<<index<<endl;
+    inline void printOutOfRange(int index) const {
+        std::cout<<"Out of range "<<"n="<<n<<" index="<<index<<std::endl;
     }
 
     inline void fillCoeffs(const T& filler) {
         for(int i = 0; i < n; i++)
             this->coeffs[i] = filler;
+    }
+
+    inline T* createOneDimArray(int n) const {
+        return new T[n];
     }
 
     public:
@@ -41,6 +50,7 @@ class Point {
             result[i] = x[i];
         return result;
     }
+
     Point(int n) {
         this->n = correctDimension(n);
         this->coeffs = createOneDimArray(this->n);
@@ -66,15 +76,19 @@ class Point {
         delete coeffs;
     }
 
-    T& operator[] (int index) {
+    int length() {
+        return n;
+    }
+
+    T& operator[] (int index) const {
         if(checkBoundary(index)) {
             return coeffs[index];
         }
         printOutOfRange(index);
-        return *coeffs;
+        return coeffs[n-1];
     }
 
-    inline T& enorm() {
+    inline T& enorm() const {
         T result = 0;
         for(int i =0; i < n; i++)
             result+=coeffs[i];
@@ -94,7 +108,7 @@ class Point {
         return *this;
     }
 
-    inline const Point<T> operator *(const T& scalar) {
+    inline const Point<T> operator *(const T& scalar) const {
         Point<T> res(*this);
         for(int i = 0; i < n; i++)
             res[i] *=scalar;
@@ -107,7 +121,7 @@ class Point {
         return Point(*this);
     }    
     
-    inline const Point<T> operator /(const T& scalar) {
+    inline const Point<T> operator /(const T& scalar) const{
         Point<T> res(*this);
         if(scalar != 0) {
             for(int i = 0; i < n; i++)
@@ -124,7 +138,7 @@ class Point {
         return Point(*this);
     }
 
-    inline const Point<T> operator +(const Point<T>& x) {
+    inline const Point<T> operator +(const Point<T>& x) const {
         Point<T> res(*this);
         for(int i = 0; i < n; i++)
             res[i] += x[i];
@@ -137,13 +151,10 @@ class Point {
         return Point(*this);
     }
 
-    inline const Point<T> operator -(const Point<T>& x) {
+    inline const Point<T> operator -(const Point<T>& x) const {
         Point<T> res(*this);
         for(int i = 0; i < n; i++)
             res[i] -= x[i];
-
-        double a = 2;
-        double b = a*=4;
         return res;
     }
 
@@ -153,8 +164,44 @@ class Point {
         return Point(*this);
     }
 
-    inline void print(string name) {
-        printArray(coeffs, n, name);
+    inline void print(std::string name, int countOfNumbers=0, int precision=0) const {
+        std::cout<<std::endl<<name<<std::endl;
+        this->forEach([&](int i, const Point<T>& point) -> void {
+            if(countOfNumbers != 0 && precision != 0) {
+                std::cout<<std::fixed<<std::setw(countOfNumbers)<<std::setprecision(precision)<<point[i]<<" ";
+            } else {
+                std::cout<<point[i]<<" ";
+            }
+
+    });
+        std::cout<<std::endl;
+    }
+
+    inline void forEach(std::function<void (int, const Point<T>&)> callback) const  {
+        for(int i = 0; i < n; i++) {
+            callback(i, *this);
+        }
+    }
+
+    inline void forEachFrom(int from, std::function<void (int, const Point<T>&)> callback) const  {
+        for(int i = from; i < n; i++) {
+            callback(i, *this);
+        }
+    }
+
+    inline void forEachFromTo(int from, int to, std::function<void (int, const Point<T>&)> callback) const  {
+        for(int i = from; i < to && i < n; i++) {
+            callback(i, *this);
+        }
+    }
+
+    // todo try to add this to matrix
+    template<class R>
+    inline const R reduce(R startAcc, std::function<R (R&, int, const Point<T>&)> callback) const {
+        for(int i = 0; i < n; i++){
+            startAcc = callback(startAcc, i, *this);
+        }
+        return startAcc;
     }
 };
 

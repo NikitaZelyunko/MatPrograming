@@ -10,56 +10,95 @@ const int POSITIVE_CERTAINTY = 1;
 const int NEGATIVE_CERTAINTY = 2;
 
 template <class S>
-class MatrixSylvesterTest : MatrixAbstractSolver<int, S> {
+class MatrixSylvesterTest : public MatrixAbstractSolver<int, S> {
     private:
-    const S multKElementsPoint(const Point<S>& point, int k) {
-        S result = 1;
-        for(int i = 0; i<point.n() && i < k; i++) {
-            result*=point[i];
-        }
-        return result;
-    }
-    const int resolveCertainty() {
+    const Point<S> resolveCertainty() const {
         int minDimension = min(this->matrix.getColumnCount(), this->matrix.getRowCount());
-        Point<S> cornerMinors = Point<S>(minDimension);
+        Point<S> cornerMinors = Point<S>(minDimension, 1);
         Matrix<S> resultMatrix = Matrix<S>(this->matrix);
         if(Matrix<S>::isSquare(resultMatrix)) {
             try {
                 resultMatrix.forDiag([&](int i, const Matrix<S>& x) -> void {
                     S xii = x[i][i];
+                    cornerMinors[i] *= xii;
                     if(abs(xii) >= this->getEpsilon()) {
-                        for(int k = i + 1; k < x.getColumnCount(); k++) {
-                            S identifier = x[k][i]/xii;
-                            for (int j = i; j < x.getColumnCount(); j++) {
-                                x[k][j] -= x[i][j] * identifier;
-                            }
+                        if(i + 1 < cornerMinors.length()) {
+                            cornerMinors[i+1] *= cornerMinors[i];
+                        }
+                    } else {
+                        int notNullRow = this->findFirstNotNullElementIndexInColumn(x, i, i);
+                        if(notNullRow != i) {
+                            cornerMinors.forEachFromTo(i + 1, notNullRow, [&](int i, const Point<S> &point) -> void {
+                                point[i] = 0;
+                            });
+                            x.swapRows(i, notNullRow);
+                            xii = x[i][i];
+                            cornerMinors[notNullRow] *= -xii;
+
+                        } else {
+                            cornerMinors.forEachFrom(i+1, [&](int i, const Point<S> &point) -> void {
+                                point[i] = 0;
+                            });
+                            throw ALTERNATING_CERTAINTY;
                         }
                     }
-
+                    for(int k = i + 1; k < x.getColumnCount(); k++) {
+                        S identifier = x[k][i]/xii;
+                        for (int j = i; j < x.getColumnCount(); j++) {
+                            x[k][j] -= x[i][j] * identifier;
+                        }
+                    }
                 });
             }
             catch (int err) {
             }
         }
-        return ALTERNATING_CERTAINTY;
+        return cornerMinors;
     }
 
-    protected: 
+    protected:
     /*
         If matrix is positive certainty return 1;
         If matrix is negative certainty return 2;
         Else return 0.        
     **/
     virtual const int computeResult() const {
-
+        Point<S> cornerMinors = resolveCertainty();
+        cornerMinors.print("Corner minors:");
+        try {
+            return cornerMinors.template reduce<int>(0, [&](int& acc, int i, const Point<S>& point) -> int {
+                if(i == 0) {
+                    if(point[i] >= this->getEpsilon()) {
+                        return POSITIVE_CERTAINTY;
+                    }
+                    if(point[i] <= -this->getEpsilon()) {
+                        return NEGATIVE_CERTAINTY;
+                    }
+                }
+                if(acc == POSITIVE_CERTAINTY && point[i] >= this->getEpsilon()) {
+                    return acc;
+                }
+                if(acc == NEGATIVE_CERTAINTY) {
+                    if(i % 2 == 0) {
+                        if(point[i] <= -this->getEpsilon()) {
+                            return acc;
+                        }
+                    } else {
+                        if(point[i] >= this->getEpsilon()) {
+                            return acc;
+                        }
+                    }
+                }
+                throw ALTERNATING_CERTAINTY;
+            });
+        }
+        catch (int err) {
+            return ALTERNATING_CERTAINTY;
+        }
     }
 
     public:
-    using MatrixAbstractSolver<int,S>::MatrixAbstractSolver;
-
-    const int solve() {
-        return ALTERNATING_CERTAINTY;
-    }
+    using MatrixAbstractSolver<int, S>::MatrixAbstractSolver;
 };
 
 void TestMatrixSylvesterTest();

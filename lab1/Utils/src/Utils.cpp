@@ -11,9 +11,8 @@ double eNorm(double * x, int n)
 
 void printArray(double * a, int n, string comment)
 {
-	
 	if (a) {
-		cout << comment << endl;
+		cout << endl << comment << endl;
 		for (int i = 0; i < n; i++) {
 			cout << a[i] << " ";
 		}

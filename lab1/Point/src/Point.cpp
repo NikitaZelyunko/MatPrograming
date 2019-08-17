@@ -1,9 +1,10 @@
 #include "../include/Point.h"
+#include "Utils.h"
 
 void TestPoint() {
-    cout<<endl<<endl;
-    cout<<"--------------"<<endl;
-    cout<<"TEST POINT LIB"<<endl;
+    std::cout<<std::endl<<std::endl;
+    std::cout<<"--------------"<<std::endl;
+    std::cout<<"TEST POINT LIB"<<std::endl;
     Point<double> a = Point<double>(1);
     Point<double> b = Point<double>(2);
     Point<double> c = Point<double>(2, -2);
