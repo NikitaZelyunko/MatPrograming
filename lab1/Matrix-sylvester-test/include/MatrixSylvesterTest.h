@@ -50,21 +50,18 @@ class MatrixSylvesterTest : public MatrixAbstractSolver<int, S> {
                     }
                 });
             }
-            catch (int err) {
-            }
+            catch (int err) {}
+        } else {
+            return Point<S>(minDimension, 0.0);
         }
         return cornerMinors;
     }
 
     protected:
-    /*
-        If matrix is positive certainty return 1;
-        If matrix is negative certainty return 2;
-        Else return 0.        
-    **/
+
     virtual const int computeResult() const {
         Point<S> cornerMinors = resolveCertainty();
-        cornerMinors.print("Corner minors:");
+        cornerMinors.print("cornerMinors:");
         try {
             return cornerMinors.template reduce<int>(0, [&](int& acc, int i, const Point<S>& point) -> int {
                 if(i == 0) {
@@ -99,6 +96,14 @@ class MatrixSylvesterTest : public MatrixAbstractSolver<int, S> {
 
     public:
     using MatrixAbstractSolver<int, S>::MatrixAbstractSolver;
+    /*
+        If matrix is positive certainty return 1;
+        If matrix is negative certainty return 2;
+        Else return 0.
+    **/
+    virtual int solve() {
+        return MatrixAbstractSolver<int, S>::solve();
+    }
 };
 
 void TestMatrixSylvesterTest();
