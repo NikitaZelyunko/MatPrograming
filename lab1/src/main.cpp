@@ -89,12 +89,13 @@ int main() {
 	double *x0 = new double[n];
 	x0[0] = 0;
 	x0[1] = 0;
-	// TestMatrix();
-    // TestMatrixDeterminantSolver();
-	// TestMatrixInverseSolver();
-	 TestMatrixSylvesterTest();
-	// double* result = getTochnValue(x0, n, 0.001, 0.001, f1, gradF1, gessianF1, getMinimum1, 1000000);
-	// MyCustomOneDimFunc myFunc(f1, gradF1, gessianF1, x0, x0, n);
-	// printArray(result, n, "Result:");
+//	 TestMatrix();
+//	 TestMatrixDeterminantSolver();
+//	 TestMatrixInverseSolver();
+	 TestSimplePolinom();
+//	 TestMatrixSylvesterTest();
+//	 double* result = getTochnValue(x0, n, 0.001, 0.001, f1, gradF1, gessianF1, getMinimum1, 1000000);
+//	 MyCustomOneDimFunc myFunc(f1, gradF1, gessianF1, x0, x0, n);
+//	 printArray(result, n, "Result:");
 	return 0;
 }

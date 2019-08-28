@@ -63,7 +63,7 @@ class MatrixSylvesterTest : public MatrixAbstractSolver<int, S> {
         Point<S> cornerMinors = resolveCertainty();
         cornerMinors.print("cornerMinors:");
         try {
-            return cornerMinors.template reduce<int>(0, [&](int& acc, int i, const Point<S>& point) -> int {
+            return cornerMinors.template reduce<int>(0, [&](const int& acc, int i, const Point<S>& point) -> const int& {
                 if(i == 0) {
                     if(point[i] >= this->getEpsilon()) {
                         return POSITIVE_CERTAINTY;

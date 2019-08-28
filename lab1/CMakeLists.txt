@@ -17,6 +17,8 @@ add_subdirectory(Matrix-determinant-solver)
 add_subdirectory(Matrix-inverse-solver)
 add_subdirectory(Matrix-sylvester-test)
 
+add_subdirectory(Simple-polinom)
+
 add_subdirectory(NR)
 
 set(INCLUDE_DIR ${CMAKE_HOME_DIRECTORY}/include )
@@ -37,5 +39,7 @@ target_link_libraries(lab1 MatrixInverseSolver)
 target_link_libraries(lab1 MatrixDeterminantSolver)
 
 target_link_libraries(lab1 MatrixSylvesterTest)
+
+target_link_libraries(lab1 SimplePolinom)
 
 target_link_libraries(lab1 NR)

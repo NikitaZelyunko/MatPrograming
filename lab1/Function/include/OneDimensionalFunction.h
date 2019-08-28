@@ -6,9 +6,14 @@ template <class T>
 class OneDimensionalFunction : public Function<T>
 {
 public:
-    virtual T& operator() (T&);
-    OneDimensionalFunction() {}
-    ~OneDimensionalFunction();
+    using Function<T>::Function;
+    virtual const T& operator() (const T& point) { return point; };
+    virtual ~OneDimensionalFunction();
 };
+
+template<class T>
+OneDimensionalFunction<T>::~OneDimensionalFunction() {
+
+}
 
 #endif

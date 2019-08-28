@@ -7,7 +7,6 @@
 
 #include <functional>
 
-
 template<class T>
 class Point {
     private:
@@ -51,6 +50,11 @@ class Point {
         return result;
     }
 
+    Point() {
+        this->n = 0;
+        this->coeffs = nullptr;
+    }
+
     Point(int n) {
         this->n = correctDimension(n);
         this->coeffs = createOneDimArray(this->n);
@@ -76,7 +80,7 @@ class Point {
         delete coeffs;
     }
 
-    int length() {
+    int length() const {
         return n;
     }
 
@@ -183,6 +187,12 @@ class Point {
         }
     }
 
+    inline void forEachReverse(std::function<void (int, const Point<T>&)> callback) const  {
+        for(int i = n-1; i >= 0; i--) {
+            callback(i, *this);
+        }
+    }
+
     inline void forEachFrom(int from, std::function<void (int, const Point<T>&)> callback) const  {
         for(int i = from; i < n; i++) {
             callback(i, *this);
@@ -197,11 +207,12 @@ class Point {
 
     // todo try to add this to matrix
     template<class R>
-    inline const R reduce(R startAcc, std::function<R (R&, int, const Point<T>&)> callback) const {
+    inline const R& reduce(const R& startAcc, std::function<const R& (const R&, int, const Point<T>&)> callback) const {
+        R bufAcc = startAcc;
         for(int i = 0; i < n; i++){
-            startAcc = callback(startAcc, i, *this);
+            bufAcc = callback(bufAcc, i, *this);
         }
-        return startAcc;
+        return std::move(bufAcc);
     }
 };
 
