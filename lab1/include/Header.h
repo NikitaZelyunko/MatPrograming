@@ -4,4 +4,5 @@
 #include "MatrixDeterminantSolver.h"
 #include "MatrixInverseSolver.h"
 #include "MatrixSylvesterTest.h"
-#include "SimplePolinom.h"
+#include "SimplePolynomial.h"
+#include "SimplePolynomialRealRootsBoundariesSolver.h"

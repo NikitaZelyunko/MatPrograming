@@ -207,12 +207,12 @@ class Point {
 
     // todo try to add this to matrix
     template<class R>
-    inline const R& reduce(const R& startAcc, std::function<const R& (const R&, int, const Point<T>&)> callback) const {
+    inline const R reduce(const R startAcc, std::function<const R (const R, int, const Point<T>&)> callback) const {
         R bufAcc = startAcc;
         for(int i = 0; i < n; i++){
             bufAcc = callback(bufAcc, i, *this);
         }
-        return std::move(bufAcc);
+        return bufAcc;
     }
 };
 

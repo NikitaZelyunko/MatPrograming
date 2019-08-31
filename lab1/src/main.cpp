@@ -92,7 +92,8 @@ int main() {
 //	 TestMatrix();
 //	 TestMatrixDeterminantSolver();
 //	 TestMatrixInverseSolver();
-	 TestSimplePolinom();
+//    TestSimplePolynomial();
+    TestSimplePolynomialRealRootsBoundariesSolver();
 //	 TestMatrixSylvesterTest();
 //	 double* result = getTochnValue(x0, n, 0.001, 0.001, f1, gradF1, gessianF1, getMinimum1, 1000000);
 //	 MyCustomOneDimFunc myFunc(f1, gradF1, gessianF1, x0, x0, n);

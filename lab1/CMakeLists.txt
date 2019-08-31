@@ -17,7 +17,8 @@ add_subdirectory(Matrix-determinant-solver)
 add_subdirectory(Matrix-inverse-solver)
 add_subdirectory(Matrix-sylvester-test)
 
-add_subdirectory(Simple-polinom)
+add_subdirectory(Simple-polynomial)
+add_subdirectory(Simple-polynomial-real-roots-boundaries-solver)
 
 add_subdirectory(NR)
 
@@ -40,6 +41,7 @@ target_link_libraries(lab1 MatrixDeterminantSolver)
 
 target_link_libraries(lab1 MatrixSylvesterTest)
 
-target_link_libraries(lab1 SimplePolinom)
+target_link_libraries(lab1 SimplePolynomial)
+target_link_libraries(lab1 SimplePolynomialRealRootsBoundariesSolver)
 
 target_link_libraries(lab1 NR)

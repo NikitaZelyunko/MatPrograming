@@ -25,7 +25,8 @@ inline double module(double x) {
 	return x < 0 ? -x : x;
 }
 
-inline bool sign(double x) {
+template<class T =double>
+inline bool sign(T x) {
 	return x < 0 ? false : true;
 }
 
