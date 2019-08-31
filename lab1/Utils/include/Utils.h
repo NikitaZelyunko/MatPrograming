@@ -30,6 +30,30 @@ inline bool sign(T x) {
 	return x < 0 ? false : true;
 }
 
+/* T is iterable with [] operator**/
+template<class T>
+const T findMax(T* arr, int n) {
+    T max = arr[0];
+    for(int i = 0; i < n; i++) {
+        if(max < arr[i]){
+            max = arr[i];
+        }
+    }
+    return max;
+}
+
+template<class T>
+const T findMin(T* arr, int n) {
+    T min = arr[0];
+    for(int i = 0; i < n; i++) {
+        if(min > arr[i]){
+            min = arr[i];
+        }
+    }
+    return min;
+}
+
+
 void printArray(double* a, int n, string comment);
 void printArray(double** a, int n, int m, string comment);
 

@@ -50,6 +50,14 @@ class Point {
         return result;
     }
 
+    static T* toArray(const Point<T>& point){
+//        T* arr = new T[point.length()];
+        return point.reduce<T*>(new T[point.length()], [](T* acc, int i, const Point<T> point) -> T* {
+           acc[i] = T(point[i]);
+           return acc;
+        });
+    }
+
     Point() {
         this->n = 0;
         this->coeffs = nullptr;
