@@ -7,7 +7,7 @@ class OneDimensionalFunction : public Function<T>
 {
 public:
     using Function<T>::Function;
-    virtual const T& operator() (const T& point) { return point; };
+    virtual const T operator() (const T& point) { return point; };
     virtual ~OneDimensionalFunction();
 };
 

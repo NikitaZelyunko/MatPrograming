@@ -29,13 +29,13 @@ void TestSimplePolynomialRealRootsBoundariesSolver() {
     SimplePolynomialRealRootsBoundariesSolver<double> solver3(polynomial2, 1, 0.00001);
     printBoundaries(solver3.solve());
 
-//    Point<double> koeffs4(7);
-//    koeffs4[0] = -2880; koeffs4[1] = -1344; koeffs4[2] = 1780; koeffs4[3] = 72; koeffs4[4] = -161; koeffs4[5] = 12; koeffs4[6] = 1;
-//    SimplePolynomial<double> polynomial4(koeffs4);
-//    polynomial4.print("f4(x):");
-//    SimplePolynomialRealRootsBoundariesSolver<double> solver4(koeffs4.length(), Point<double>::toArray(koeffs4), 0, 0.00001);
-//    printBoundaries(solver4.solve());
-//
+    Point<double> koeffs4(7);
+    koeffs4[0] = -2880; koeffs4[1] = -1344; koeffs4[2] = 1780; koeffs4[3] = 72; koeffs4[4] = -161; koeffs4[5] = 12; koeffs4[6] = 1;
+    SimplePolynomial<double> polynomial4(koeffs4);
+    polynomial4.print("f4(x):");
+    SimplePolynomialRealRootsBoundariesSolver<double> solver4(koeffs4.length(), Point<double>::toArray(koeffs4), 1, 1);
+    printBoundaries(solver4.solve());
+
 //    polynomial4.print("f4(x):");
 //    SimplePolynomialRealRootsBoundariesSolver<double> solver5(polynomial4, 1, 0.00001);
 //    printBoundaries(solver5.solve());

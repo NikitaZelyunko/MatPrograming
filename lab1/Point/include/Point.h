@@ -107,14 +107,14 @@ class Point {
         return sqrt(result);
     }
 
-    inline const Point<T> operator =(const Point<T>& x) {
+    inline Point<T>& operator =(const Point<T>& x) {
         n = x.n;
         delete coeffs;
         coeffs = copyArray(x.coeffs, x.n);
         return *this;
     }
 
-    inline const Point<T> operator =(const T& scalar) {
+    inline const Point<T> operator =(const T& scalar) const {
         delete coeffs;
         fillCoeffs(scalar);
         return *this;
@@ -127,10 +127,10 @@ class Point {
         return res;
     }
 
-    inline const Point<T> operator *=(const T& scalar) {
+    inline Point<T>& operator *=(const T& scalar) {
         for(int i = 0; i < n; i++)
             coeffs[i]*=scalar;
-        return Point(*this);
+        return *this;
     }    
     
     inline const Point<T> operator /(const T& scalar) const{
@@ -152,26 +152,26 @@ class Point {
 
     inline const Point<T> operator +(const Point<T>& x) const {
         Point<T> res(*this);
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < x.length(); i++)
             res[i] += x[i];
         return res;
     }
 
-    inline const Point<T> operator +=(const Point<T>& x) {
-        for(int i = 0; i < n; i++)
+    inline Point<T>& operator +=(const Point<T>& x) {
+        for(int i = 0; i < x.length(); i++)
             coeffs[i]+=x[i];
-        return Point(*this);
+        return *this;
     }
 
     inline const Point<T> operator -(const Point<T>& x) const {
         Point<T> res(*this);
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < x.length(); i++)
             res[i] -= x[i];
         return res;
     }
 
     inline const Point<T> operator -=(const Point<T>& x) {
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < x.length(); i++)
             coeffs[i]-=x[i];
         return Point(*this);
     }
@@ -215,13 +215,23 @@ class Point {
 
     // todo try to add this to matrix
     template<class R>
-    inline const R reduce(const R startAcc, std::function<const R (const R, int, const Point<T>&)> callback) const {
+    inline const R reduce(const R startAcc, std::function<const R (const R&, int, const Point<T>&)> callback) const {
         R bufAcc = startAcc;
         for(int i = 0; i < n; i++){
             bufAcc = callback(bufAcc, i, *this);
         }
         return bufAcc;
     }
+
+    template<class R>
+    inline const R reduceReverse(const R startAcc, std::function<const R (const R&, int, const Point<T>&)> callback) const {
+        R bufAcc = startAcc;
+        for(int i = n-1; i >=0; i--){
+            bufAcc = callback(bufAcc, i, *this);
+        }
+        return bufAcc;
+    }
+
 };
 
 void TestPoint();

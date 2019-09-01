@@ -9,7 +9,7 @@ template<class T>
 class Function
 {
 public:
-    virtual const T& operator() (const Point<T>& p) { return p[0]; };
+    virtual const T operator() (const Point<T>& p) { return p[0]; };
     Function() = default;
     virtual  ~Function() = default;
 };
